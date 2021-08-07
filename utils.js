@@ -13,17 +13,37 @@ function makeid(length, type) {
     return result;
 }
 
-function error(error, message) {
-    console.log(codes.getCodesArray());
+function success(data) {
     return {
+        "success": true,
+        "data": data
+    }
+}
+
+function error(error, message) {
+    return {
+        "success": false,
         "errors": [
             {
                 "code": codes.getCodesArray()[error],
                 "reason": message
             }
-        ],
-        "success": false
+        ]
     }
 }
 
-module.exports = { makeid, error }
+function get_headers(request) {
+    if (
+        !request.headers['content-type'] || 
+        !request.headers['user-agent'] || 
+        !request.headers['timestamp']
+    ) throw 'Some required request headers not found.';
+
+    return headers = {
+        'Content-Type': request.headers['content-type'],
+        'User-Agent': request.headers['user-agent'],
+        'Timestamp': request.headers['timestamp']
+    } 
+}
+
+module.exports = { makeid, success, error, get_headers }
