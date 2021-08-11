@@ -1,4 +1,6 @@
 const codes = require('./error-codes');
+const config = require('./config');
+const route = `/api/v${config.version}`
 
 function makeid(length, type) {
     var result = '';
@@ -13,22 +15,44 @@ function makeid(length, type) {
     return result;
 }
 
-function success(data) {
-    return {
-        "success": true,
-        "data": data
+class Error {
+    constructor() {
+        return codes.getCodesArray();
     }
 }
 
-function error(error, message) {
-    return {
-        "success": false,
-        "errors": [
-            {
-                "code": codes.getCodesArray()[error],
-                "reason": message
-            }
-        ]
+class ErrorResponse {
+    constructor(code, reason) {
+        return {
+            "success": false,
+            "errors": [
+                {
+                    "code": code,
+                    "reason": reason
+                }
+            ]
+        }
+    }
+}
+
+class Response {
+    constructor(data) {
+        return {
+            "success": true,
+            "data": data
+        }
+    }
+}
+
+class Endpoints {
+    constructor(app) {
+        this.app = app;
+    }
+
+    add(endpoints) {
+        endpoints.forEach(endpoint => {
+            app.use(`${route}/${endpoint}`, require('./endpoints/' + endpoint + '.js'));
+        })
     }
 }
 
@@ -46,4 +70,4 @@ function get_headers(request) {
     } 
 }
 
-module.exports = { makeid, success, error, get_headers }
+module.exports = { makeid, Endpoints, Response, Error, ErrorResponse, get_headers }
