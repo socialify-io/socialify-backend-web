@@ -1,10 +1,12 @@
 let express = require('express');
+let session = require('express-session');
 let app = express();
 let config = require('./config');
-let session = require('express-session');
+let utils = require('./utils');
 let db_setup = require('./db/create_users_db');
-
-let route = `/api/v${config.version}`
+let Error = new utils.Error();
+let ErrorResponse = utils.ErrorResponse;
+let Endpoints = new utils.Endpoints(app);
 
 app.use(express.static('static'))
 app.use(express.json());
@@ -21,18 +23,17 @@ app.use(session({
 db_setup();
 
 // Endpoints
-var example = require('./endpoints/example.js');
-var register = require('./endpoints/register.js');
-
-app.use(`${route}/example`, example);
-app.use(`${route}/register`, register);
+Endpoints.add([
+    "register",
+    "report_error"
+]);
 
 // Internal Server Error handling
 app.use((err, req, res, text) => {
     console.log(err.stack);
-    // res.type('text/plain');
-    // res.status(500);
-    // res.send(utils.error("InternalServerError", "Internal Server Error"))
+    res.type('text/plain');
+    res.status(500);
+    res.send(new ErrorResponse(Error.InternalServerError, "Internal Server Error"));
 })
 
 let server = app.listen(config.port, () => console.log('SocialifyWeb-Backend listening on port 5001!'));
