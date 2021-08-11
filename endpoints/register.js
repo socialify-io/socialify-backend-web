@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var utils = require('../utils');
-var db = require('../db/db').db;
+var Response = utils.Response;
+var Error = new utils.Error();
+var ErrorResponse = utils.ErrorResponse;
+var db = require('../db/db').users;
 var bcrypt = require('bcrypt');
 
 router.get('/', async (req, res) => {
-    // res.status(405).sendFile("templates\\what_are_you_looking_for.html", {root: `${__dirname}\\..\\static\\`});
+    res.status(405).sendFile("templates\\what_are_you_looking_for.html", {root: `${__dirname}\\..\\static\\`});
 })
 
 router.post('/', async (req, res) => {
@@ -15,12 +18,12 @@ router.post('/', async (req, res) => {
     try {
         headers = utils.get_headers(req);
     } catch {
-        // return res.status(400).json(utils.error("InvalidHeaders", "Some required request headers not found."));
+        return res.status(400).json(new ErrorResponse(Error.InvalidHeaders, "Some required request headers not found."));
     }
 
     var body = req.body;
 
-    // if (!body.username || !body.password) return res.status(500).send("no jestes spierdolony, nie dla ciebie te api jest")
+    if (!body.username || !body.password) return res.status(400).json({"success": false, "errors": [{"message": "Bad Request"}]});
 
     var username = body.username;
     var password = body.password;
@@ -41,12 +44,12 @@ router.post('/', async (req, res) => {
                 }
 
                 if (found) {
-                    return res.status(400).json(utils.error("InvalidUsername", "This username is already taken."));
+                    return res.status(400).json(new ErrorResponse(Error.InvalidUsername, "This username is already taken."));
                 } else {
                     bcrypt.hash(password, 12, function(err, hash) {
                         if (err) throw err;
                         db.run(`INSERT INTO users (username, password) VALUES ('${username}', '${hash}');`);
-                        return res.status(200).json(utils.success({}));
+                        return res.status(200).json(new Response({}));
                     });
                 }
 
@@ -55,7 +58,7 @@ router.post('/', async (req, res) => {
         });
 
     } else {
-        return res.status(400).json(utils.error("InvalidRepeatPassword", "Passwords are not same."));
+        return res.status(400).json(new ErrorResponse(Error.InvalidRepeatPassword, "Passwords are not same."));
     }
 
 })
