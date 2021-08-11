@@ -51,7 +51,7 @@ class Endpoints {
 
     add(endpoints) {
         endpoints.forEach(endpoint => {
-            app.use(`${route}/${endpoint}`, require('./endpoints/' + endpoint + '.js'));
+            this.app.use(`${route}/${endpoint}`, require('./endpoints/' + endpoint + '.js'));
         })
     }
 }
