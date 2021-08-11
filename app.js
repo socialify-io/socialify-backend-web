@@ -24,8 +24,7 @@ db_setup();
 
 // Endpoints
 Endpoints.add([
-    "register",
-    "report_error"
+    "register"
 ]);
 
 // Internal Server Error handling
