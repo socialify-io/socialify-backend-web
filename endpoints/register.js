@@ -7,10 +7,6 @@ var ErrorResponse = utils.ErrorResponse;
 var db = require('../db/db').users;
 var bcrypt = require('bcrypt');
 
-router.get('/', async (req, res) => {
-    res.status(405).sendFile("templates\\what_are_you_looking_for.html", {root: `${__dirname}\\..\\static\\`});
-})
-
 router.post('/', async (req, res) => {
 
     var headers;

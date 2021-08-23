@@ -1,6 +1,4 @@
-var db = require('./db').db;
-
-function setup() {
+function setup(db) {
     db.serialize(function() {
 
         db.run(`CREATE TABLE IF NOT EXISTS users 

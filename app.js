@@ -3,7 +3,7 @@ let session = require('express-session');
 let app = express();
 let config = require('./config');
 let utils = require('./utils');
-let db_setup = require('./db/create_users_db');
+let db_setup = require('./db/db').db_setup;
 let Error = new utils.Error();
 let ErrorResponse = utils.ErrorResponse;
 let Endpoints = new utils.Endpoints(app);
@@ -24,8 +24,13 @@ db_setup();
 
 // Endpoints
 Endpoints.add([
-    "register"
+    {"file": "register", "path": "register"},
 ]);
+
+// Not found Error handling
+app.use(function (req, res, next) {
+    res.status(404).sendFile("templates\\what_are_you_looking_for.html", {root: `${__dirname}\\static\\`});
+})
 
 // Internal Server Error handling
 app.use((err, req, res, text) => {
@@ -35,4 +40,4 @@ app.use((err, req, res, text) => {
     res.send(new ErrorResponse(Error.InternalServerError, "Internal Server Error"));
 })
 
-let server = app.listen(config.port, () => console.log('SocialifyWeb-Backend listening on port 5001!'));
+let server = app.listen(config.port, () => console.log(`SocialifyWeb-Backend listening on port ${config.port}!`));
