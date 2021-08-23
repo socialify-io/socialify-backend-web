@@ -25,6 +25,7 @@ db_setup();
 // Endpoints
 Endpoints.add([
     {"file": "register", "path": "register"},
+    {"file": "report_error", "path": "reportError"}
 ]);
 
 // Not found Error handling
